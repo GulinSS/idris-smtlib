@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/stefan-hoeck/idris2-pack:latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache pack
+        uses: actions/cache@v4
+        with:
+          path: /root/.pack
+          key: ${{ runner.os }}-pack-${{ hashFiles('**/*.ipkg', 'pack.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-pack-
+
+      - name: System info
+        run: |
+          idris2 --version
+          pack --version
+
+      - name: Install Z3
+        run: |
+          apt-get update
+          apt-get install -y z3
+
+      - name: Build library
+        run: pack build smtlib.ipkg
+
+      - name: Run tests
+        run: pack test smtlib.ipkg
