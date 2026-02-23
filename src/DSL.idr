@@ -128,17 +128,20 @@ getModel = lift SGetModel
 
 public export
 writeCommands : SMTScript a -> Writer (List Command) a
-writeCommands = foldMap $ \instruction =>
-  case instruction of
-    SDeclareReal s => do tell [declareConst s "Real"]
-                         pure $ RealVar s
-    SDeclareInt s => do tell [declareConst s "Int"]
-                        pure $ IntVar s
-    SDeclareBV s n => do tell [declareConst s $ "(_ BitVec " ++ show n ++ ")"]
-                         pure $ BVVar s n
-    SAssert t => tell [Assert t]
-    SCheckSat => tell [CheckSat]
-    SGetModel => tell [GetModel]
+writeCommands fr with (toView fr)
+  writeCommands _ | (Pure a') = pure a'
+  writeCommands _ | (Bind instruction k) = do
+    res <- case instruction of
+      SDeclareReal s => do tell [declareConst s "Real"]
+                           pure $ RealVar s
+      SDeclareInt s => do tell [declareConst s "Int"]
+                          pure $ IntVar s
+      SDeclareBV s n => do tell [declareConst s $ "(_ BitVec " ++ show n ++ ")"]
+                           pure $ BVVar s n
+      SAssert t => tell [Assert t]
+      SCheckSat => tell [CheckSat]
+      SGetModel => tell [GetModel]
+    assert_total $ writeCommands (k res)
 
 public export
 renderCommands : SMTScript a -> List Command

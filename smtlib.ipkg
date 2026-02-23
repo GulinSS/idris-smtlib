@@ -8,8 +8,7 @@ sourcedir = "src"
 depends = contrib
         , freer
 
-modules = Util
-        , AST
+modules = AST
         , Print
         , Parse
         , DSL
