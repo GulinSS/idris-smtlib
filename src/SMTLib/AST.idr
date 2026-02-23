@@ -1,4 +1,4 @@
-module AST
+module SMTLib.AST
 
 %default total
 

@@ -8,9 +8,9 @@ sourcedir = "src"
 depends = contrib
         , freer
 
-modules = AST
-        , Print
-        , Parse
-        , DSL
+modules = SMTLib.AST
+        , SMTLib.Print
+        , SMTLib.Parse
+        , SMTLib.DSL
 
 opts = "--total"

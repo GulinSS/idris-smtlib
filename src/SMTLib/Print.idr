@@ -1,8 +1,8 @@
-module Print
+module SMTLib.Print
 
 import Text.PrettyPrint.Prettyprinter
 
-import AST
+import SMTLib.AST
 
 %default total
 

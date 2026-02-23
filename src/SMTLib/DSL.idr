@@ -1,10 +1,10 @@
-module DSL
+module SMTLib.DSL
 
 import Control.Monad.Identity
 import Control.Monad.Free
 import Control.Monad.Writer
 
-import AST
+import SMTLib.AST
 
 %default total
 
