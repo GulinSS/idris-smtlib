@@ -68,6 +68,10 @@ d : Double -> Term
 d x = Lit (Decimal x)
 
 public export
+FromDouble Term where
+  fromDouble = d
+
+public export
 data SMTReal = RealVar String
 
 public export
