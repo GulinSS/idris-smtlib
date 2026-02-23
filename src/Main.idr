@@ -3,7 +3,7 @@ module Main
 import System
 import Text.PrettyPrint.WL
 
-import Control.Monad.Freer
+import Control.Monad.Free
 import Control.Monad.Identity
 import Control.Monad.Writer
 
@@ -29,14 +29,14 @@ ex2 = do ds <- traverse declareInt ["circle", "triangle", "square"]
          checkSat
          getModel
 
-isDigit : Term -> Term  
+isDigit : Term -> Term
 isDigit x = (0 `le` x) `and` (x `le` 9)
 
 constructWord : List Term -> Term
-constructWord xs = sum $ zipWith (*) (reverse xs) $ map fromInteger $ take (length xs) (iterate (*10) 1)         
-        
+constructWord xs = sum $ zipWith (*) (reverse xs) $ map fromInteger $ take (length xs) (iterate (*10) 1)
+
 ex3 : SMTScript ()
-ex3 = do ds' <- traverse declareInt ["D", "E", "M", "N", "O", "R", "S", "Y"] 
+ex3 = do ds' <- traverse declareInt ["D", "E", "M", "N", "O", "R", "S", "Y"]
          let ds = map toTermI ds'
          assert $ distinct ds
          traverse_ (assert . isDigit) ds
@@ -54,30 +54,30 @@ ex4 = do ds' <- traverse declareInt ["A", "I", "L", "N", "O", "R", "S", "T", "V"
          assert $ distinct ds
          traverse_ (assert . isDigit) ds
          let [a,i,l,n,o,r,s,t,v] = ds | _ => pure ()
-         let violin = constructWord [v,i,o,l,i,n]               
-         let viola  = constructWord [v,i,o,l,a]               
-         let sonata = constructWord [s,o,n,a,t,a]               
-         let trio   = constructWord [t,r,i,o]               
+         let violin = constructWord [v,i,o,l,i,n]
+         let viola  = constructWord [v,i,o,l,a]
+         let sonata = constructWord [s,o,n,a,t,a]
+         let trio   = constructWord [t,r,i,o]
          assert $ (violin + violin + viola) `eq` (trio + sonata)
          checkSat
          getModel
-         
+
 ex5 : SMTScript ()
 ex5 = do ds' <- traverse declareInt ["H", "E", "L", "O", "W", "R", "D"]
          let ds = map toTermI ds'
-         let isPos = \x => (1 `le` x) `and` (x `le` 9) 
+         let isPos = \x => (1 `le` x) `and` (x `le` 9)
          assert $ distinct ds
          traverse_ (assert . isPos) ds
          let [h,e,l,o,w,r,d] = ds | _ => pure ()
          assert $ (h + e + l + l + o) `eq` 25
          assert $ (w + o + r + l + d) `eq` 25
          checkSat
-         getModel         
-           
+         getModel
+
 {-
 ex6 : SMTScript ()
 ex6 = do bv <- declareBV "out" 64
-         checkSat 
+         checkSat
          getModel
 -}
 
@@ -95,6 +95,6 @@ main = do let inf = "test5а.smt2"
           i <- execZ3 inf outf
           printLn i
           eos <- readFile outf
-          case eos of 
+          case eos of
             Left err => printLn err
             Right str => for_ (lines str) putStrLn

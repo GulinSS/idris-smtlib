@@ -5,58 +5,70 @@ import Text.PrettyPrint.WL
 import AST
 
 %default total
-%access public export
 
+public export
 ppSList : (a -> Doc) -> List a -> Doc
 ppSList pp xs = parens (hsep (map pp xs))
 
+public export
 ppListOpt : (a -> Doc) -> List a -> Doc
 ppListOpt _  [] = empty
 ppListOpt pp xs = space |+| hsep (map pp xs)
 
+public export
 ppMaybe : (a -> Doc) -> Maybe a -> Doc
 ppMaybe pp ma = maybe empty (\a => space |+| pp a) ma
 
+public export
 ppSym : Symbol -> Doc
 ppSym (MkSymbol s) = text s
 
+public export
 ppLiteral : Literal -> Doc
 ppLiteral (Numeral i) = integer i
 ppLiteral (Decimal d) = double d
 
 -- TODO use sizeAccessible? it doesn't like ppSort passed to map recursively
 mutual
+  public export
   ppSort : Sort -> Doc
   ppSort (MkSort (MkIdentifier id _) []) = ppSym id
   ppSort (MkSort (MkIdentifier id _) subs@(_ :: _)) = parens (ppSym id |++| hsep (ppSortAux subs))
 
+  public export
   ppSortAux : List Sort -> List Doc
   ppSortAux [] = []
   ppSortAux (s :: xs) = ppSort s :: ppSortAux xs
 
+public export
 ppSortedVar : SortedVar -> Doc
 ppSortedVar (MkSortedVar name sort) = ppSym name |++| ppSort sort
 
 -- TODO HOFs again
 mutual
+  public export
   ppSExpr : SExpr -> Doc
   ppSExpr (SList sexprs) = parens (hsep (ppSExprAux sexprs))
   ppSExpr (SKeyword kw) = text kw
   ppSExpr (SSymbol sym) = ppSym sym
 
+  public export
   ppSExprAux : List SExpr -> List Doc
   ppSExprAux [] = []
   ppSExprAux (s :: sexps) = ppSExpr s :: ppSExprAux sexps
 
+public export
 ppQId : QIdentifier -> Doc
 ppQId (MkQIdentifier (MkIdentifier id _) Nothing)     = ppSym id
 ppQId (MkQIdentifier (MkIdentifier id _) (Just sort)) = parens (text "as" |++| ppSym id |++| ppSort sort)
 
 -- TODO HOFs yet again
 mutual
+  public export
   ppVarBind : VarBinding -> Doc
   ppVarBind (MkVarBinding name term) = parens (ppSym name |++| ppTerm term)
 
+  public export
   ppTerm : Term -> Doc
   ppTerm (Lit lit) = ppLiteral lit
   ppTerm (QI qid) = ppQId qid
@@ -66,18 +78,22 @@ mutual
   ppTerm (Forall sv svs t) = parens (text "forall" |++| parens (ppSortedVar sv |+| ppListOpt ppSortedVar svs) |++| ppTerm t)
   ppTerm (Exists sv svs t) = parens (text "exists" |++| parens (ppSortedVar sv |+| ppListOpt ppSortedVar svs) |++| ppTerm t)
 
+  public export
   ppTermAux : List Term -> List Doc
   ppTermAux [] = []
   ppTermAux (t :: ts) = ppTerm t :: ppTermAux ts
 
+public export
 ppFunDef : FunDef -> Doc
 ppFunDef (MkFunDef name svars ret body) = ppSym name |++| ppSList ppSortedVar svars |++| ppSort ret |++| ppTerm body
 
+public export
 ppOption : SMTOption -> Doc
 ppOption (ProduceModels b) = text ":produce-models" |++| bool b
 ppOption (ProduceProofs b) = text ":produce-proofs" |++| bool b
 ppOption (ProduceUnsatCores b) = text ":produce-unsat-cores" |++| bool b
 
+public export
 ppCommand : Command -> Doc
 ppCommand (Echo str)                = text "echo" |++| text str
 ppCommand (DeclareConst name sort)  = text "declare-const" |++| ppSym name |++| ppSort sort
@@ -93,8 +109,10 @@ ppCommand (Pop n)                   = text "pop" |+| ppMaybe int n
 ppCommand (SetOption opt)           = text "set-option" |++| ppOption opt
 ppCommand Reset                     = text "reset"
 
+public export
 toDoc : Command -> Doc
 toDoc c = parens $ ppCommand c
 
+public export
 ppScript : List Command -> Doc
 ppScript cs = vsep $ map toDoc cs

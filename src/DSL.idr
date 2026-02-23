@@ -1,76 +1,95 @@
 module DSL
 
 import Control.Monad.Identity
-import Control.Monad.Freer
+import Control.Monad.Free
 import Control.Monad.Writer
 
 import AST
 
 %default total
-%access public export
 
+public export
 declareConst : String -> String -> Command
 declareConst name sort = DeclareConst (MkSymbol name) (MkSort (MkIdentifier (MkSymbol sort) []) [])
 
+public export
 var : String -> Term
 var name = QI (MkQIdentifier (MkIdentifier (MkSymbol name) []) Nothing)
 
+public export
 app : String -> List Term -> Term
 app nam ts = FunApp (MkQIdentifier (MkIdentifier (MkSymbol nam) []) Nothing) ts
 
 -- TODO something more typesafe?
+public export
 eq : Term -> Term -> Term
 eq t1 t2 = app "=" [t1, t2]
 
+public export
 le : Term -> Term -> Term
 le t1 t2 = app "<=" [t1, t2]
 
+public export
 and : Term -> Term -> Term
 and t1 t2 = app "and" [t1, t2]
 
+public export
 distinct : List Term -> Term
 distinct = app "distinct"
 
+public export
 Num Term where
   fromInteger i = Lit (Numeral i)
   t1 + t2 = app "+" [t1, t2]
   t1 * t2 = app "*" [t1, t2]
 
+public export
 Neg Term where
   negate t = app "-" [0, t]
   t1 - t2 = app "-" [t1, t2]
 
+public export
 index : Term -> Term -> Term
 index t1 t2 = app "_" [t1, t2]
 
+public export
 bvand : Term -> Term -> Term
 bvand t1 t2 = app "bvand" [t1, t2]
 
+public export
 bvashr : Term -> Term -> Term
 bvashr t1 t2 = app "bvashr" [t1, t2]
 
 --bvlit : String -> Nat -> Term
---bvlit s n = index 
+--bvlit s n = index
 
+public export
 d : Double -> Term
 d x = Lit (Decimal x)
 
+public export
 data SMTReal = RealVar String
 
+public export
 toTerm : SMTReal -> Term
 toTerm (RealVar name) = var name
 
+public export
 data SMTInt = IntVar String
 
+public export
 toTermI : SMTInt -> Term
 toTermI (IntVar name) = var name
 
-data SMTBV : Nat -> Type where 
+public export
+data SMTBV : Nat -> Type where
   BVVar : String -> (n : Nat) -> SMTBV n
 
+public export
 toTermBV : SMTBV n -> Term
 toTermBV (BVVar name _) = var name
 
+public export
 data SMTScriptF : Type -> Type where
   SDeclareReal : String -> SMTScriptF SMTReal
   SDeclareInt : String -> SMTScriptF SMTInt
@@ -79,29 +98,37 @@ data SMTScriptF : Type -> Type where
   SCheckSat : SMTScriptF ()
   SGetModel : SMTScriptF ()
 
+public export
 SMTScript : Type -> Type
-SMTScript = Freer SMTScriptF
+SMTScript = Free SMTScriptF
 
+public export
 declareReal : String -> SMTScript SMTReal
-declareReal s = liftF $ SDeclareReal s
+declareReal s = lift $ SDeclareReal s
 
+public export
 declareInt : String -> SMTScript SMTInt
-declareInt s = liftF $ SDeclareInt s
+declareInt s = lift $ SDeclareInt s
 
+public export
 declareBV : String -> (n : Nat) -> SMTScript (SMTBV n)
-declareBV s n = liftF $ SDeclareBV s n
+declareBV s n = lift $ SDeclareBV s n
 
+public export
 assert : Term -> SMTScript ()
-assert t = liftF $ SAssert t 
+assert t = lift $ SAssert t
 
+public export
 checkSat : SMTScript ()
-checkSat = liftF SCheckSat 
+checkSat = lift SCheckSat
 
+public export
 getModel : SMTScript ()
-getModel = liftF SGetModel
+getModel = lift SGetModel
 
+public export
 writeCommands : SMTScript a -> Writer (List Command) a
-writeCommands = foldFreer $ \instruction =>
+writeCommands = foldMap $ \instruction =>
   case instruction of
     SDeclareReal s => do tell [declareConst s "Real"]
                          pure $ RealVar s
@@ -113,5 +140,6 @@ writeCommands = foldFreer $ \instruction =>
     SCheckSat => tell [CheckSat]
     SGetModel => tell [GetModel]
 
+public export
 renderCommands : SMTScript a -> List Command
 renderCommands = snd . runIdentity . runWriterT . writeCommands

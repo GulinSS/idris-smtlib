@@ -6,10 +6,9 @@ version = 0.1.0
 sourcedir = "src"
 
 depends = contrib
-        , free
+        , freer
 
 modules = Util
-        , Control.Monad.Freer
         , AST
         , Print
         , Parse
