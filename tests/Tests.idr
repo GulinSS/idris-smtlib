@@ -1,7 +1,7 @@
-module Main
+module Tests
 
 import System
-import Text.PrettyPrint.WL
+import Text.PrettyPrint.Prettyprinter
 
 import Control.Monad.Free
 import Control.Monad.Identity
