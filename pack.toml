@@ -1,0 +1,5 @@
+[custom.all.smtlib]
+type = "local"
+path = "."
+ipkg = "smtlib.ipkg"
+test = "tests/tests.ipkg"

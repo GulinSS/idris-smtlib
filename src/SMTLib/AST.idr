@@ -1,27 +1,35 @@
-module AST
+module SMTLib.AST
 
 %default total
-%access public export
 
+public export
 data Symbol = MkSymbol String
 
+public export
 data SExpr = SList (List SExpr)
            | SKeyword String
            | SSymbol Symbol
 
+public export
 data Literal = Numeral Integer
              | Decimal Double -- TODO something with better precision
 
 -- Identifier used to be indexed with Index type, that could be either SSymbol or SNumeral.
 -- This is actually the current (2.5) SMT-LIB standard.
 -- But in order to support some extensions in Z3, we use full SExpr as index.
+public export
 data Identifier = MkIdentifier Symbol (List SExpr)
+public export
 data Sort = MkSort Identifier (List Sort)
+public export
 data QIdentifier = MkQIdentifier Identifier (Maybe Sort)
+public export
 data SortedVar = MkSortedVar Symbol Sort
 
 mutual
+  public export
   data VarBinding = MkVarBinding Symbol Term
+  public export
   data Term = Lit Literal
             | QI QIdentifier
             | FunApp QIdentifier (List Term)
@@ -31,13 +39,16 @@ mutual
             -- TODO rest
 
 -- TODO inline to DefineFun ?
+public export
 data FunDef = MkFunDef Symbol (List SortedVar) Sort Term
 
+public export
 data SMTOption = ProduceModels Bool
                | ProduceProofs Bool
                | ProduceUnsatCores Bool
                -- TODO rest
 
+public export
 data Command = Echo String
              | DeclareConst Symbol Sort
              | DeclareFun Symbol (List Sort) Sort

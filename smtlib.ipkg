@@ -1,12 +1,16 @@
-package SmtLib
+package smtlib
 
-sourcedir = src
+authors = "clayrat"
+version = 0.1.0
 
-modules = Util 
-        , Control.Monad.Freer
-        , AST
-        , Print
-        , Parse
-        , DSL
-        
-opts = "-p contrib -p idris_free --total"
+sourcedir = "src"
+
+depends = contrib
+        , freer
+
+modules = SMTLib.AST
+        , SMTLib.Print
+        , SMTLib.Parse
+        , SMTLib.DSL
+
+opts = "--total"

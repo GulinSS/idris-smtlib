@@ -1,0 +1,57 @@
+--- Example 1 ---
+(declare-const x Real)
+(declare-const y Real)
+(declare-const z Real)
+(assert (= (- (+ (* 3.0 x) (* 2.0 y)) z) 1.0))
+(assert (= (+ (- (* 2.0 x) (* 2.0 y)) (* 4.0 z)) (- 0 2.0)))
+(assert (= (- (+ (- 0 x) (* 0.5 y)) z) 0.0))
+(check-sat)
+(get-model)
+--- Example 2 ---
+(declare-const circle Int)
+(declare-const triangle Int)
+(declare-const square Int)
+(assert (= (+ circle circle) 10))
+(assert (= (+ (* circle square) square) 12))
+(assert (= (- (* circle square) (* triangle circle)) circle))
+(check-sat)
+(get-model)
+--- Example 3 ---
+(declare-const D Int)
+(declare-const E Int)
+(declare-const M Int)
+(declare-const N Int)
+(declare-const O Int)
+(declare-const R Int)
+(declare-const S Int)
+(declare-const Y Int)
+(assert (distinct D E M N O R S Y))
+(assert (and (<= 0 D) (<= D 9)))
+(assert (and (<= 0 E) (<= E 9)))
+(assert (and (<= 0 M) (<= M 9)))
+(assert (and (<= 0 N) (<= N 9)))
+(assert (and (<= 0 O) (<= O 9)))
+(assert (and (<= 0 R) (<= R 9)))
+(assert (and (<= 0 S) (<= S 9)))
+(assert (and (<= 0 Y) (<= Y 9)))
+(assert (= (+ (+ (+ (+ (+ 0 (* D 1)) (* N 10)) (* E 100)) (* S 1000)) (+ (+ (+ (+ 0 (* E 1)) (* R 10)) (* O 100)) (* M 1000))) (+ (+ (+ (+ (+ 0 (* Y 1)) (* E 10)) (* N 100)) (* O 1000)) (* M 10000))))
+(check-sat)
+(get-model)
+0
+sat
+(
+  (define-fun W () Int
+    3)
+  (define-fun E () Int
+    1)
+  (define-fun D () Int
+    7)
+  (define-fun R () Int
+    5)
+  (define-fun O () Int
+    2)
+  (define-fun H () Int
+    6)
+  (define-fun L () Int
+    8)
+)
