@@ -1,0 +1,29 @@
+=== Test: Start/Stop Solver ===
+Solver started successfully
+Solver closed with exit code: 0
+
+=== Test: Simple Command ===
+CheckSat response: Right "sat"
+
+=== Test: Declare Const ===
+Commands sent: Right ()
+CheckSat response: Right "sat"
+
+=== Test: withSolver ===
+Success! Response: "sat"
+
+=== Test: Batch Commands ===
+Batch sent: Right ()
+CheckSat response: Right "sat"
+
+=== Test: Linear Equations ===
+Sending commands...
+Commands sent: Right ()
+CheckSat response: Right "sat"
+
+=== Test: Get Model ===
+Commands sent: Right ()
+CheckSat response: Right "sat"
+GetModel response: Right "(\n  (define-fun x () Int\n    42)\n)"
+
+=== All tests completed ===

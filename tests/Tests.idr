@@ -3,4 +3,6 @@ module Tests
 import Test.Golden.RunnerHelper
 
 main : IO ()
-main = goldenRunner [ "Lib tests" `atDir` "lib" ]
+main = goldenRunner [ "Lib tests" `atDir` "lib"
+                    , "Backend tests" `atDir` "backend"
+                    ]

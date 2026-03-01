@@ -12,5 +12,6 @@ modules = SMTLib.AST
         , SMTLib.Print
         , SMTLib.Parse
         , SMTLib.DSL
+        , SMTLib.Backend
 
 opts = "--total"
