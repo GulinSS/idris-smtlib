@@ -105,7 +105,7 @@ main = do
   renderSMT ex2
   putStrLn "--- Example 3 ---"
   renderSMT ex3
-  let inf = "test5а.smt2"
+  let inf = "test5a.smt2"
   let outf = "out.smt2"
   writeSMT ex5 inf
   i <- execZ3 inf outf
