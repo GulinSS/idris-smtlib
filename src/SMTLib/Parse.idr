@@ -237,3 +237,35 @@ parseCommand (SList (SSymbol (MkSymbol "push") :: rest)) = Just (Push Nothing)
 parseCommand (SList (SSymbol (MkSymbol "pop") :: rest)) = Just (Pop Nothing)
 parseCommand (SList (SSymbol (MkSymbol "reset") :: _)) = Just Reset
 parseCommand _ = Nothing
+
+-- ============================================================================
+-- Command and Script Parsers (String -> Command)
+-- ============================================================================
+
+||| Parse a Command from string
+||| This combines parsing the string to S-Expression and then to Command
+export
+parseCommandFromString : String -> Maybe Command
+parseCommandFromString s = do
+  sexpr <- parseSExpr s
+  parseCommand sexpr
+
+||| Parse remaining commands from string (for incremental parsing)
+parseCommands' : String -> Maybe (List Command, String)
+parseCommands' s = let s' = dropSpaces s in
+  case unpack s' of
+    [] => Just ([], "")
+    _ => case parseSExpr' s' of
+      Nothing => Just ([], s')
+      Just (sexpr, rest) => case parseCommand sexpr of
+        Nothing => Just ([], s')
+        Just cmd => case assert_total (parseCommands' rest) of
+          Nothing => Just ([cmd], rest)
+          Just (cmds, rest2) => Just (cmd :: cmds, rest2)
+
+||| Parse a script (list of commands) from string
+export
+parseScript : String -> Maybe (List Command)
+parseScript s = case parseCommands' s of
+  Just (cmds, rest) => if all isSpace (unpack (dropSpaces rest)) then Just cmds else Nothing
+  Nothing => Nothing
