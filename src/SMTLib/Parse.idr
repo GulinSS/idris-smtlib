@@ -7,6 +7,25 @@ import SMTLib.AST
 %default total
 
 -- ============================================================================
+-- Error Handling
+-- ============================================================================
+
+||| Parse error with message
+public export
+record ParseError where
+  constructor MkParseError
+  message : String
+
+export
+Show ParseError where
+  show (MkParseError msg) = "Parse error: \{msg}"
+
+||| Convert a Maybe to Either with a simple error message
+toEither : String -> Maybe a -> Either ParseError a
+toEither msg Nothing = Left (MkParseError msg)
+toEither _ (Just a) = Right a
+
+-- ============================================================================
 -- Simple String-based S-Expression Parser
 -- ============================================================================
 
@@ -269,3 +288,22 @@ parseScript : String -> Maybe (List Command)
 parseScript s = case parseCommands' s of
   Just (cmds, rest) => if all isSpace (unpack (dropSpaces rest)) then Just cmds else Nothing
   Nothing => Nothing
+
+-- ============================================================================
+-- Error Handling - Either-based Parsing
+-- ============================================================================
+
+||| Parse an S-Expression with error information
+export
+parseSExprEither : String -> Either ParseError SExpr
+parseSExprEither s = toEither "Failed to parse S-Expression" (parseSExpr s)
+
+||| Parse a Command with error information
+export
+parseCommandEither : String -> Either ParseError Command
+parseCommandEither s = toEither "Failed to parse command" (parseCommandFromString s)
+
+||| Parse a script with error information
+export
+parseScriptEither : String -> Either ParseError (List Command)
+parseScriptEither s = toEither "Failed to parse script" (parseScript s)
