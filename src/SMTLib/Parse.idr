@@ -121,18 +121,18 @@ parseSList s = case parseSList' s of
 -- AST Parsers (from S-Expressions)
 -- ============================================================================
 
-||| Parse a Literal from S-Expression
-export
-parseLiteral : SExpr -> Maybe Literal
-parseLiteral (SList _) = Nothing
-parseLiteral (SKeyword _) = Nothing
-parseLiteral (SSymbol (MkSymbol s)) = case unpack s of
-  ('-' :: cs) => case readDigits (pack cs) of
-    Just (ds, "") => Just (Numeral (negate (cast ds)))
-    _ => Nothing
-  _ => case readDigits s of
-    Just (ds, "") => Just (Numeral (cast ds))
-    _ => Nothing
+-- ||| Parse a Literal from S-Expression
+-- export
+-- parseLiteral : SExpr -> Maybe Literal
+-- parseLiteral (SList _) = Nothing
+-- parseLiteral (SKeyword _) = Nothing
+-- parseLiteral (SSymbol (MkSymbol s)) = case unpack s of
+--   ('-' :: cs) => case readDigits (pack cs) of
+--     Just (ds, "") => Just (Numeral (negate (cast ds)))
+--     _ => Nothing
+--   _ => case readDigits s of
+--     Just (ds, "") => Just (Numeral (cast ds))
+--     _ => Nothing
 
 ||| Get symbol name from SExpr
 getSymbol : SExpr -> Maybe String
@@ -194,6 +194,7 @@ mutual
   parseTerm (SSymbol s) = Just (QI (MkQIdentifier (MkIdentifier s []) Nothing))
   parseTerm (SKeyword _) = Nothing
   parseTerm (SList []) = Nothing
+  parseTerm (SLiteral l) = pure $ Lit l
 
   ||| Parse let bindings from rest of S-Expression
   parseLetBody : List SExpr -> Maybe (VarBinding, Term)
