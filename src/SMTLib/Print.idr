@@ -87,11 +87,16 @@ public export
 ppFunDef : FunDef -> Doc ()
 ppFunDef (MkFunDef name svars ret body) = ppSym name <++> ppSList ppSortedVar svars <++> ppSort ret <++> ppTerm body
 
+||| Convert Bool to SMT-LIB format (lowercase true/false)
+ppBool : Bool -> Doc ()
+ppBool True = pretty "true"
+ppBool False = pretty "false"
+
 public export
 ppOption : SMTOption -> Doc ()
-ppOption (ProduceModels b) = pretty ":produce-models" <++> pretty b
-ppOption (ProduceProofs b) = pretty ":produce-proofs" <++> pretty b
-ppOption (ProduceUnsatCores b) = pretty ":produce-unsat-cores" <++> pretty b
+ppOption (ProduceModels b) = pretty ":produce-models" <++> ppBool b
+ppOption (ProduceProofs b) = pretty ":produce-proofs" <++> ppBool b
+ppOption (ProduceUnsatCores b) = pretty ":produce-unsat-cores" <++> ppBool b
 
 public export
 ppCommand : Command -> Doc ()
